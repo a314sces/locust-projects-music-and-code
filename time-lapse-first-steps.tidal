@@ -1,0 +1,86 @@
+-- https://mmxximnml.bandcamp.com/track/lenny-foret-time-lapse
+
+-- CHORD PATTERN: STEP-BY-STEP BREAKDOWN
+-- This tutorial builds up the complex pattern from simple elements
+
+-- STEP 1: BASIC TRIAD
+-- Let's start with a basic minor triad
+-- In music theory, a minor triad consists of the root, flat 3rd and 5th
+-- In pattern notation, this is [0,2,4] in a minor scale
+-- This plays all three notes simultaneously (because of the square brackets and commas)
+
+d7 $ n (scale "minor" "[0,2,4]") # s "seven"
+
+-- STEP 2: ADD THE KEY
+-- Now let's specify that we want to be in the key of F
+-- The |+ n "f" adds an offset to place us in F minor
+-- (TidalCycles understands note names like "f", "c", "g#", etc.)
+
+d7 $ n (scale "minor" "[0,2,4]") # s "seven" |+ n "f"
+
+-- STEP 3: SET THE OCTAVE
+-- Let's place our chord in a specific octave
+-- The |+ n (X |* 12) shifts up or down by X octaves
+-- 0 |* 12 = keep current octave, 1 |* 12 = up one octave, -1 |* 12 = down one octave
+
+d7 $ n (scale "minor" "[0,2,4]") # s "seven" |+ n (0 |* 12) |+ n "f"
+
+-- STEP 4: TRANSPOSITION WITHIN THE SCALE
+-- Now let's add a transposition within the scale
+-- The |+ "-4" means "shift everything down 4 scale degrees"
+-- This creates more movement in the harmony
+
+d7 $ n (scale "minor" "[0,2,4]") |+ "-4" # s "seven" |+ n (0 |* 12) |+ n "f"
+
+-- STEP 5: ADD EXTENSIONS TO THE CHORD
+-- Now let's add some color tones to our chord
+-- -14 adds a note 14 scale degrees below (creates depth)
+-- -4 adds another color tone
+-- The _ (underscore) represents a rest or silence in that position
+
+d7 $ n (scale "minor" "[0,2,4,-14,-4 _]") |+ "-4" # s "seven" |+ n (0 |* 12) |+ n "f"
+
+-- STEP 6: ADD A SECOND TRANSPOSITION LAYER
+-- Finally, let's add the second transposition layer
+-- This |+ "0" doesn't change anything now, but could be modified later
+-- For example, changing it to |+ "2" would shift everything up 2 scale degrees
+
+d7 $ n (scale "minor" "[0,2,4,-14,-4 _]") |+ "-4" |+ "0" # s "seven" |+ n (0 |* 12) |+ n "f"
+
+-- FINAL PATTERN:
+-- This is the complete pattern from the desert-minimal track
+
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" 
+  |+ "-4" 
+  |+ "0")) 
+  # s "seven" 
+  |+ n ("0" |* 12) 
+  |+ n "f" 
+
+-- VARIATIONS TO TRY:
+-- 1. Change the scale: replace "minor" with "major", "dorian", "mixolydian" etc.
+d7 $ n (scale "major" ( "[0,2,4, -14, -4 _ ]" |+ "-4" |+ "0")) # s "seven" |+ n ("0" |* 12) |+ n "f" 
+
+-- 2. Change the key: replace "f" with "c", "g", "a", etc.
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" |+ "-4" |+ "0")) # s "seven" |+ n ("0" |* 12) |+ n "c" 
+
+-- 3. Change the octave: replace "0" with "1" or "-1"
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" |+ "-4" |+ "0")) # s "seven" |+ n ("1" |* 12) |+ n "f" 
+
+-- 4. Add pattern variation with cycle-based changes using angle brackets
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" |+ "-4" |+ "<0 2>")) # s "seven" |+ n ("0" |* 12) |+ n "f" 
+
+-- 5. Add a rhythmic component by replacing simultaneous notes with sequential
+d7 $ n (scale "minor" ( "[0 2 4 -14 -4 _ ]" |+ "-4" |+ "0")) # s "seven" |+ n ("0" |* 12) |+ n "f" 
+
+-- UNDERSTANDING THE STRUCTURE:
+-- scale "minor" - Maps the numbers to a minor scale
+-- [0,2,4,-14,-4 _] - A chord structure with the root(0), minor 3rd(2), 5th(4), plus extensions
+-- |+ "-4" - Transposes everything down 4 scale degrees
+-- |+ "0" - Additional transposition layer (can be changed for variation)
+-- # s "seven" - Uses the sound "seven" (a synth sound in SuperCollider)
+-- |+ n ("0" |* 12) - Sets the octave (0 = same octave, 1 = up one octave, etc.)
+-- |+ n "f" - Places everything in the key of F
+
+-- TRY PUTTING IT ALL TOGETHER IN DIFFERENT WAYS!
+

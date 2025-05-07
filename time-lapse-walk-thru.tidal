@@ -1,0 +1,393 @@
+----------------------------------------------------------------------------------------------------------
+-- Desert Minimal Track: TidalCycles Workshop Tutorial
+-- This file breaks down elements of the desert-minimal track for live performance
+-- Evaluate each line or block sequentially (place cursor on the line and press Shift+Enter)
+-- Comments explain what each part does and the concepts involved
+----------------------------------------------------------------------------------------------------------
+
+-- INTRO: SETUP AND ONE-SHOT SAMPLES
+-- These are atmospheric risers played once to create tension at the beginning
+-- TIP: 'once' plays a sample just one time (not looped)
+
+once $ s "riser:308"  -- Try playing these one at a time
+once $ s "riser:262"  -- Different sample number = different sound
+once $ s "riser:132"  -- Create a build-up effect
+
+-- Set the tempo in cycles per second (BPM/60/4)
+-- 126 BPM ÷ 60 seconds ÷ 4 beats = cycles per second
+setcps (126/60/4)
+
+-- OPTIONAL: Sync with external software like Ableton Live
+-- Only uncomment this if you have Carabiner set up
+-- sock <- carabiner tidal 4 (-0.14)
+
+-- 'hush' silences everything - use this when you need to start fresh
+hush
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 1: CHORD PROGRESSION WITH SCALES
+-- This creates the pad sound that establishes the harmony
+-- TIP: In TidalCycles, 'd7' is a channel (you can use d1-d16)
+
+-- Start with a complex chord
+-- Breakdown:
+-- 1. scale "minor" - uses the minor scale
+-- 2. [0,2,4, -14, -4 _ ] - chord structure with root, 3rd, 5th, plus extensions
+-- 3. |+ "-4" - transposes down 4 semitones
+-- 4. # s "seven" - uses sound "seven" (connection to SuperCollider)
+-- 5. |+ n ("0" |* 12) - octave setting
+-- 6. |+ n "f" - transposes to key of F
+
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" 
+  |+ "-4" 
+  |+ "0")) 
+  # s "seven" 
+  |+ n ("0" |* 12) 
+  |+ n "f" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 2: BASIC BEAT
+-- This adds a foundational drum pattern
+-- TIP: The pattern "{0 1 2 3...}%8" plays 16 steps at 8 steps per cycle speed
+
+d2 $ n ("{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15}%8" 	
+  |+ ("<0>" |* "16")  -- Pattern modification: shifts which samples are played
+  |+ "-24")           -- Transposes pitch down 24 semitones
+  # s "drums"         -- Uses the "drums" sound bank
+ 
+----------------------------------------------------------------------------------------------------------
+-- SECTION 3: ADDING TEXTURE
+-- This adds a sparse percussive element that creates texture
+-- TIP: The {2 ~ }%8 pattern plays note 2 followed by silence at 8 steps per cycle
+
+d3 $ n ("{2 ~ }%8" 	
+  |+ ("<0>" |* "16")
+  |+ "-24")
+  # s "three" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 4: CHANNEL PROCESSING
+-- These 'f3' and 'f4' lines control audio effects on channels
+-- TIP: 'segment 5' divides the cycle into 5 equal parts
+-- TIP: 'stack' lets you apply multiple parameters at once
+
+f3 $ segment 5 $ s "ch3"  
+    # stack [lowcut 0,        -- Low frequency filter (0 = off)
+          highcut 127,        -- High frequency filter (127 = mostly on)
+          -- level 107,       -- Volume level (commented out)
+          senda 10,           -- Send to effect bus A (reverb)
+          sendb "<0 10 0 20 0 30>"]  -- Send to effect bus B (delay) with pattern
+
+f4 $ segment 5 $ s "ch4"  
+    # stack [lowcut 0,
+          highcut 0,
+          -- level 107,
+          senda 40,
+          sendb 0]	
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 5: CHORD VARIATIONS
+-- These change the harmonic content by modifying the chord progression
+-- TIP: "0'maj" is a major chord at root position
+
+-- Switch to a major chord
+d7 $ n (scale "minor" ( "0'maj" 
+  |+ "0" 
+  |+ "0")) 
+  # s "seven" 
+  |+ n ("-1" |* 12)  -- One octave lower than before
+  |+ n "f" 
+
+-- Return to original chord
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" 
+  |+ "-4" 
+  |+ "0")) 
+  # s "seven" 
+ |+ n ("0" |* 12) 
+  |+ n "f" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 6: EFFECT PARAMETER CHANGES
+-- These modify the effect settings to create movement in the sound
+-- TIP: Changing parameters over time creates dynamic evolution
+
+f3 $ segment 5 $ s "ch3"  
+    # stack [lowcut 127,      -- Now cutting more low frequencies
+          highcut 127,
+          -- level 107,
+          senda 40,
+          sendb 0]
+
+f3 $ segment 5 $ s "ch3"  
+    # stack [lowcut 0,        -- Return to original filter settings
+          highcut 127,        -- But with a level parameter added
+          level 105,
+          senda 40,
+          sendb 0]
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 7: ADDING MELODIC VARIATION
+-- This introduces more movement to the chord progression
+-- TIP: <6 2> alternates between these values on successive cycles
+
+-- Comment: "new stuff" indicates a new section in the performance
+-- Add a new note to the chord with alternating values
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ , ~ <6 2 >]" 
+  |+ "-4" 
+  |+ "<0>"))  -- -4 then -5
+  # s "seven" 
+ |+ n ("0" |* 12) 
+  |+ n "f" 
+
+-- Repeat with same pattern to establish it
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ , ~ <6 2 >]" 
+  |+ "-4" 
+  |+ "<0>"))  -- -4 then -5
+  # s "seven" 
+ |+ n ("0" |* 12) 
+  |+ n "f" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 8: EXPANDING THE PATTERN
+-- Here the pattern grows with more alternating values
+-- TIP: <6 4 8 2> cycles through these four values
+
+-- Add a 4-value pattern that cycles through different notes
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ , ~ <6 4 8 2 >]" 
+  |+ "-4" 
+  |+ "0"))  
+  # s "seven" 
+ |+ n ("-1" |* 12)  -- Drop octave for contrast
+  |+ n "f" 
+
+-- Return to original octave
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ , ~ <6 4 8 2 >]" 
+  |+ "-4" 
+  |+ "0")) 
+  # s "seven" 
+ |+ n ("0" |* 12) 
+  |+ n "f" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 9: MULTIPLE CHANGES (INTENSITY BUILD)
+-- This 'do' block makes multiple changes at once to build intensity
+-- TIP: 'do' lets you evaluate multiple lines simultaneously
+
+do
+ f4 $ segment 5 $ s "ch4"  
+     # stack [lowcut 0 ,
+           highcut 100,
+           -- level 107,
+           senda 100,        -- More reverb
+           sendb 80]         -- More delay
+ d2 $ n ("{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15}%8" 	
+  |+ ("<0>" |* "16")
+  |+ "-24")
+  # s "drums" 
+ d7 $ n (scale "minPent" ( "[0, <5 -2>, <8 2  1 0 > , <-8 -6 -4>] _______ " 
+  |+ "-4" 
+  |+ "0"))  
+  # s "seven" 
+  |+ n ("0" |* 12) 
+  |+ n "f" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 10: EFFECT ADJUSTMENT
+-- This makes a subtle change to the effects
+-- TIP: Small changes in effects can create meaningful sonic shifts
+
+do
+ f3 $ segment 5 $ s "ch3"  
+    # stack [lowcut 0,
+          highcut 127,
+          -- level 107,
+          senda 40,
+          sendb 0]
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 11: BACK TO BASICS
+-- This section returns to earlier patterns to create form
+-- TIP: Reusing patterns from earlier creates cohesion in your performance
+
+f3 $ segment 5 $ s "ch3"  
+    # stack [lowcut 0,
+          highcut 127,
+          -- level 107,
+          senda 40,
+          sendb 0]
+
+-- Return to simple major chord for contrast
+d7 $ n (scale "minor" ( "0'maj" 
+  |+ "0" 
+  |+ "0")) 
+  # s "seven" 
+  |+ n ("-1" |* 12) 
+  |+ n "f" 
+
+-- Back to original chord
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" 
+  |+ "-4" 
+  |+ "0")) 
+  # s "seven" 
+  |+ n ("0" |* 12) 
+  |+ n "f" 
+
+f3 $ segment 5 $ s "ch3"  
+    # stack [lowcut 0,
+          highcut 127,
+          -- level 107,
+          senda 40,
+          sendb 0]
+
+-- Bring back the sparse percussion element
+d3 $ n ("{2 ~ }%8" 	
+  |+ ("<0>" |* "16")
+  |+ "-24")
+  # s "three" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 12: EFFECT PATTERN VARIATION
+-- This creates a more complex pattern of effects
+-- TIP: Using string patterns for effect values creates rhythmic modulation
+
+f3 $ segment 5 $ s "ch3"  
+    # stack [lowcut 0,
+          highcut 127,
+          -- level 107,
+          senda "40",          -- Fixed value
+          sendb "40 0 120 0 "] -- Pattern of values creates rhythmic effect changes
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 13: DRUM PATTERN VARIATION WITH SWING
+-- This changes the drum pattern and adds swing for groove
+-- TIP: 'swingBy' adds human-like timing imperfection
+
+d2 $ 
+  swingBy 0.08 8 $ n ("{ ~ 0 1 2 }%16" 	-- Different pattern at different speed
+  |+ ("<0 1>" |* "16")                 -- Alternates between 0 and 16 offset
+  |+ "-24")
+  # s "drums" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 14: ADDING A NEW ELEMENT
+-- This introduces a new sound layer with a slow, sparse pattern
+-- TIP: 'slow 6' makes the pattern six times slower
+
+d5 $ slow 6 $ n (scale "minor" ( "0(7,8)" -- Euclidean rhythm: 7 notes over 8 steps
+  |+ "0" 
+  |+ "0")) 
+  # s "five" 
+  |+ n ("-1" |* 12) 
+  |+ n "f" 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 15: ADVANCED MODULATION PATTERNS
+-- This creates a complex, evolving sound with multiple parameters changing
+-- TIP: Using ranges like "0 .. 100" creates smooth transitions
+
+i5 $ segment 50 $ s "ch5"
+    # stack [
+        rev $ attack "0 .. 100 0 .. 10 20 .. 40",
+        slow 2 $ palindrome $ release "0 .. 100 0 .. 10 20 .. 40",
+        slow 3 $ decay "0 .. 100 0 .. 10 20 .. 40",
+        slow 11 $ freq ("0 .. 20 0 .. 10 20 .. 40" |* 8 |+ 10 ),
+        slow 9 $ res "0 .. 20 0 .. 10 20 .. 40",
+        slow "<4 1>" $ env "0 .. 100 0 .. 10 20 .. 40",
+        slow "<9 1>" $ lever1 ("0 .. 100 0 .. 10 20 .. 40" |* 0.1),
+        slow "<5 8 >" $ mod ("0 .. 100 0 .. 10 20 .. 40" |* 0.8),
+        slow "<2 4>" $ vca1 ("0 .. 100" |* 0.8),
+        slow 2 $ rev $ vca2 ("0 .. 100" |* 1.1),
+        slow 7 $ fm ("0 .. 100 0 .. 10 20 .. 40" |* 0.2),
+	""
+    ] 
+
+-- Remove the modulation by setting an empty stack
+i5 $ segment 50 $ s "ch5"
+    # stack [
+	""
+    ] 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 16: ADDING SUB BASS
+-- This adds a deep sub bass to fill out the low end
+-- TIP: Lower octaves create powerful bass sounds
+
+-- Comment: "crazy sub" indicates a significant addition to the mix
+d6 $ n (scale "minor" ( "0" 
+  |+ "0" 
+  |+ "0")) 
+  # s "six" 
+  |+ n ("-2" |* 12)  -- Two octaves down for deep sub bass
+  |+ n "f" 
+
+-- Remove the sub bass
+d6 $ silence
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 17: MORE COMPLEX MODULATION
+-- This creates another layer of modulation with specific parameters
+-- TIP: Different parameter speeds create complex, evolving textures
+
+i6 $ segment 50 $ s "ch6"
+    # stack [
+        release 0,
+        freq "0 .. 100",
+        decay "<80 !4 100 > <80!4 100> .. 0 ~ ~ ~ ",
+	""
+    ] 
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 18: THE DROP
+-- This section marks a dramatic shift in the performance
+-- TIP: Cutting frequencies suddenly creates a "drop" effect
+
+-- Comment: "drop" indicates a key moment in the performance
+f3 $ segment 50 $ s "ch3"  
+    # stack [lowcut 127,  -- Cut all low frequencies
+          highcut 127,    -- Cut all high frequencies
+          -- level 107,
+          senda 40,
+          sendb 0]
+
+----------------------------------------------------------------------------------------------------------
+-- SECTION 19: SAMPLE SLICING SECTION
+-- This uses sliced samples for rhythmic complexity
+-- TIP: 'slice' divides a sample into equal parts that can be played separately
+
+do
+ hush  -- Silence everything to start fresh
+ d3 $ 
+  slice 32 ("{0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15}%16"  -- Play slices in sequence
+  |+ "0"   -- Offset for slices
+  |% "32") $ s "desert-minimal-d3"  # hpf 800  -- High-pass filter at 800Hz
+
+-- Simplified pattern with just one slice and added gain
+d3 $ 
+  slice 32 ("{12 ~ ~ ~ }%16"  -- Just play slice 12 with rests
+  |+ "0"
+  |% "32") $ s "desert-minimal-d3"  
+  # gain "1.8"  -- Increase volume
+
+-- Additional slice pattern on a different sound
+d4 $ 
+  slice 16 ("{0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15}%8"  -- Different timing (%8)
+  |+ "0"
+  |% "16") $ s "desert-minimal-d2" 
+  # amp "{0.3 0.6 0.4 0.5 }%16"  -- Pattern of amplitude values
+
+-- End the performance
+hush
+
+----------------------------------------------------------------------------------------------------------
+-- WORKSHOP EXERCISES: 
+-- Now that you've seen how the desert-minimal track works, try these modifications:
+--
+-- 1. Change the scale from "minor" to "major" or "minPent" (pentatonic minor)
+-- 2. Modify the chord structure by changing the numbers in patterns
+-- 3. Try different swing amounts with 'swingBy'
+-- 4. Create your own effect patterns using 'stack'
+-- 5. Experiment with different sample slice patterns
+--
+-- REMEMBER: In TidalCycles, live coding is about experimentation and gradual change
+-- Try making one small modification at a time and listen to how it affects the whole
+----------------------------------------------------------------------------------------------------------

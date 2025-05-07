@@ -1,0 +1,254 @@
+-- TidalCycles Demo & Workshop Guide
+-- A comprehensive introduction to TidalCycles patterns and techniques
+-- Based on official TidalCycles documentation
+
+--------------------------------------------------------------------------------
+-- SECTION 1: GETTING STARTED - BASIC PATTERNS
+--------------------------------------------------------------------------------
+
+-- Start by booting SuperDirt in SuperCollider with:
+-- SuperDirt.start
+
+-- Basic pattern - single sounds
+-- Evaluate each line using Shift+Enter
+d1 $ sound "bd"         -- basic kick drum
+d2 $ sound "hh"         -- hi-hat
+d3 $ sound "arpy"       -- arpeggio sound
+
+-- Combine patterns with silences and multiple samples
+d1 $ sound "bd sd"      -- kick and snare
+d2 $ sound "bd sd hh cp" -- kick, snare, hi-hat, clap (4 equal divisions)
+d3 $ sound "bd sd ~ cp" -- ~ represents silence
+
+-- Shorthand: s is an alias for sound
+d1 $ s "bd sd"          -- same as sound "bd sd"
+
+-- Stopping patterns
+d1 silence               -- stop d1
+d2 silence               -- stop d2
+hush                     -- stop all patterns
+
+--------------------------------------------------------------------------------
+-- SECTION 2: PATTERN REPETITION AND SUBDIVISION
+--------------------------------------------------------------------------------
+
+-- Repeat elements with *
+d1 $ sound "bd*3"        -- plays bd three times in one cycle
+d2 $ sound "bd*2 sd*2"   -- plays bd twice, then sd twice
+
+-- Subdivide patterns with [ ]
+d1 $ sound "bd [sd cp]"  -- bd for half a cycle, then sd and cp each for 1/4 cycle
+d2 $ sound "[bd sd] [hh cp]" -- (bd sd) for half a cycle, (hh cp) for half a cycle
+d3 $ sound "[bd bd] [sd [cp cp]]" -- nested subdivision
+
+-- Repeat a subdivision with *
+d1 $ sound "bd [sd cp]*2" -- bd for half, then (sd cp sd cp) in the second half
+d2 $ sound "[bd sn]*2 cp"
+
+-- Shortcut for polyrhythms with { }
+d1 $ sound "{bd sd cp, arpy bass2 drum}" -- plays two rhythms at the same time
+
+-- Shortcut for polymeter with < >
+d1 $ sound "<bd sn> <arpy:1 arpy:2 arpy:3>"
+
+--------------------------------------------------------------------------------
+-- SECTION 3: SPEED, EFFECTS, AND PARAMETERS
+--------------------------------------------------------------------------------
+
+-- Change sample pitch/speed
+d1 $ sound "arpy" # speed "0.5"  -- slower, lower pitch
+d2 $ sound "arpy" # speed "2"    -- faster, higher pitch
+
+-- Pattern the parameter
+d1 $ sound "arpy arpy" # speed "0.5 2"
+
+-- Multiple parameters
+d1 $ sound "bd sd" # gain "1.2" # pan "0 1"  -- volume and stereo position
+
+-- Sample variation with : notation
+d1 $ sound "arpy:0 arpy:1 arpy:2 arpy:3"  -- different notes from same sample bank
+d2 $ sound "drum:0 drum:1 drum:2 drum:3"  -- different drum sounds
+
+-- Using 'n' for sample selection
+d1 $ n "0 1 2 3" # sound "arpy"  -- same as arpy:0, arpy:1, etc.
+d2 $ n (run 4) # sound "arpy"    -- shorthand for "0 1 2 3"
+
+-- Spread parameters over a pattern with $
+d1 $ sound $ "bd*2 [sd [cp cp]]"
+
+--------------------------------------------------------------------------------
+-- SECTION 4: FUNCTIONS FOR PATTERN MANIPULATION
+--------------------------------------------------------------------------------
+
+-- rev: reverse a pattern
+d1 $ rev $ sound "bd sd hh cp"  -- plays the pattern backward
+
+-- fast/slow: speed up/slow down a pattern
+d1 $ fast 2 $ sound "bd sd hh cp"  -- plays pattern twice as fast
+d2 $ slow 2 $ sound "bd sd hh cp"  -- plays pattern twice as slow
+
+-- every: apply function every n cycles
+d1 $ every 4 rev $ sound "bd sd hh cp"  -- reverse pattern every 4th cycle
+
+-- jux: juxtapose - apply function to one channel
+d1 $ jux rev $ sound "arpy arpy:1 arpy:2 arpy:3"  -- right channel reversed
+d2 $ jux (fast 2) $ sound "bd sd hh cp"  -- right channel plays twice as fast
+
+-- striate: slice a sample into parts
+d1 $ striate 4 $ sound "breaks125"  -- slice into 4 parts
+
+-- chop: similar to striate but with more control
+d1 $ chop 16 $ sound "breaks125"  -- chop into 16 parts
+
+-- RandomIzation with ? and rand
+d1 $ sound "bd? sd? hh? cp?"  -- each sound has 50% chance of playing
+d2 $ n (irand 8) # sound "arpy"  -- random samples from 0-7
+
+--------------------------------------------------------------------------------
+-- SECTION 5: MELODIES AND NOTE PATTERNS
+--------------------------------------------------------------------------------
+
+-- Play a pattern of notes
+d1 $ note "0 2 4 7" # sound "arpy"  -- plays a simple melody
+
+-- Use normal note names
+d1 $ note "c e g b" # sound "superpiano"  -- C major 7th chord as notes
+d2 $ n "c e g b" # sound "superpiano"     -- also works with n
+
+-- Chords using square brackets
+d1 $ n "[c e g] [d f a]" # sound "superpiano"  -- C major and D minor chords
+
+-- Scales
+d1 $ note (scale "major" "0 1 2 3 4 5 6 7") # sound "superpiano"  -- C major scale
+d2 $ note (scale "minor" "0 1 2 3 4 5 6 7") # sound "superpiano"  -- C minor scale
+
+-- Chord progressions
+d1 $ n "<[c e g] [d f a] [e g b] [c e g]>" # sound "superpiano"  -- I-ii-iii-I
+
+--------------------------------------------------------------------------------
+-- SECTION 6: TYPING FAST AND WELL TECHNIQUES
+--------------------------------------------------------------------------------
+
+-- Using dollar sign to avoid parentheses
+-- Instead of:
+d1 $ slow 2 (sound "bd cp bd cp")
+-- You can write:
+d1 $ slow 2 $ sound "bd cp bd cp"
+
+-- Save patterns for reuse (mini functions)
+let drum = sound "bd sd hh cp"
+let bass = sound "bass:0 bass:3 bass:1"
+
+d1 $ drum
+d2 $ bass
+d3 $ slow 2 $ drum
+
+-- Use aliases
+let pat1 = sound "hh*4" # gain (range 0.4 0.8 $ rand)
+d1 $ pat1
+
+-- Cycle variables
+d1 $ sound "bd*2 [~ sd] hh*2 [~ cp]"
+  # pan (range 0 0.5 sine)
+  # gain (range 0.8 1.2 $ slow 4 $ sine)
+
+--------------------------------------------------------------------------------
+-- SECTION 7: MULTI-CHANNEL AND TRACK TECHNIQUES
+--------------------------------------------------------------------------------
+
+-- Combine patterns with |+| or #
+d1 $ sound "bd sd" # speed 2 # delay 0.5 # delaytime 0.125 # delayfeedback 0.25
+
+-- Patterns on multiple tracks
+d1 $ sound "bd sd hh cp"
+d2 $ sound "~ [bass:2 bass:0]" # gain 1.2
+d3 $ sound "arpy*8" # speed (range 0.25 1 sine) # gain 0.9
+
+-- Combine tracks into one pattern with stack
+d1 $ stack [
+  sound "bd bd*2",
+  sound "hh*2 [hh*2 hh*4]",
+  sound "~ cp"
+]
+
+-- Alternative with do notation
+do
+  d1 $ sound "bd bd*2"
+  d2 $ sound "hh*2 [hh*2 hh*4]" 
+  d3 $ sound "~ cp"
+
+--------------------------------------------------------------------------------
+-- SECTION 8: WORKSHOP EXAMPLES (ADVANCED PATTERNS)
+--------------------------------------------------------------------------------
+
+-- Euclidean patterns with e
+d1 $ sound "bd(3,8)"  -- 3 kicks spread evenly across 8 steps
+d2 $ sound "hh(5,8) bd(3,8) cp(1,4)"
+
+-- Randomize with sometimes/often/rarely
+d1 $ sometimes (# speed 2) $ sound "bd sd hh cp"
+d2 $ often (# crush 4) $ sound "bd sd hh cp"
+
+-- Combine effects randomly
+d1 $ sometimes (# speed 2) $ sometimes (# crush 4) $ sound "bd sd hh cp"
+
+-- Custom function to make patterns (mini-functions)
+let myEffect = sometimes (rev) . sometimes (# speed 2) . rarely (# crush 4)
+d1 $ myEffect $ sound "bd sd hh*2 cp"
+
+-- Example with do notation and multiple patterns
+do
+  let bassPattern = sound "[bass:2 bass:2] bass:0"
+  let drumPattern = sound "bd [~ sd] bd cp"
+  d1 $ stack [
+    drumPattern,
+    bassPattern # gain 1.1 # lpf 1200,
+    sound "arpy(3,8)" # gain 0.8 # speed "[0.5, 0.75]" # room 0.2
+  ]
+
+-- More complex rhythmic and melodic example
+d1 $ every 4 (jux rev) $ every 2 (slow 1.5) $ 
+  n (scale "minor" $ "0 [~ 3] [2 7] 5") # sound "supersaw" 
+  # lpf (range 400 2000 $ slow 4 $ sine) 
+  # resonance 0.2
+  # room 0.3 # size 0.5
+  # gain 0.9
+
+--------------------------------------------------------------------------------
+-- SECTION 9: PUTTING IT ALL TOGETHER
+--------------------------------------------------------------------------------
+
+-- Here's a complete composition using multiple techniques
+do
+  -- Reset all channels first
+  hush
+  
+  -- Global settings
+  setcps 0.6  -- set cycles per second (tempo)
+  
+  -- Create four layers of sound
+  d1 $ stack [
+    -- Bass line
+    sound "bass:0*2 [~ bass:3] bass:0 bass:3"
+      # gain 1.1 # lpf 800 # resonance 0.2,
+    
+    -- Drum pattern
+    every 4 (rev) $ sound "bd [~ sd] bd [sd cp]"
+      # room 0.15 # size 0.3,
+    
+    -- Hi-hat pattern
+    sound "hh*8" 
+      # gain (range 0.6 0.8 $ rand) 
+      # pan (range 0.3 0.7 $ rand),
+    
+    -- Melodic pattern
+    every 2 (jux (# speed 1.5)) $ 
+      n (scale "minor" $ "0 [~ 3] [2 7] 5") # sound "arpy" 
+      # room 0.4 # size 0.6 # gain 0.85
+  ]
+
+-- Modify parts on the fly
+d2 $ sound "[arpy:9 arpy:4 arpy:2]*3" # gain 0.75 # speed (range 0.5 1.5 $ slow 4 $ sine)
+
+-- Experiment with your own combinations!
+-- Happy live coding with TidalCycles!
