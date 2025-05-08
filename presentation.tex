@@ -1,0 +1,689 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usecolortheme{dolphin}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+% \usepackage{fontawesome} % Uncomment if you need FontAwesome icons
+
+% Custom colors
+\definecolor{tidalblue}{RGB}{41, 128, 185}
+\definecolor{codegray}{RGB}{240, 240, 240}
+\definecolor{codegreen}{RGB}{0, 128, 0}
+
+% Code listing style
+\lstdefinestyle{tidal}{
+  backgroundcolor=\color{codegray},
+  commentstyle=\color{codegreen},
+  basicstyle=\ttfamily\small,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2
+}
+\lstset{style=tidal}  % Apply this style globally
+
+\title{Music and Code: Introduction to Livecoding with TidalCycles}
+\subtitle{Algorithmic Control of External Hardware \& DAWs}
+\author{Lenny Foret}  % Replace with your actual name
+\institute{Music Technology Workshop for Locust Projects}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{What is TidalCycles?}
+\begin{columns}
+\column{0.6\textwidth}
+\begin{itemize}
+    \item Live coding environment for creating algorithmic patterns
+    \item Especially powerful for rhythmic and pattern-based music
+    \item Created by Alex McLean as part of the Algorave movement
+    \item Open source, written in Haskell
+    \item Concise syntax for complex musical ideas
+\end{itemize}
+
+\column{0.4\textwidth}
+% \begin{center}
+% \includegraphics[width=0.8\linewidth]{tidalcycles_logo.png}
+% \end{center}
+\end{columns}
+\end{frame}
+
+% Additional slides would go here, with similar commented image placeholders
+
+
+\begin{frame}{Seminar Overview}
+\begin{itemize}
+    \item What is TidalCycles?
+    \item Producer-oriented approach
+    \item Using TidalCycles with external instruments
+    \item Pattern concepts and syntax
+    \item MIDI integration
+    \item Automation and control
+    \item Workshop: Analyzing a live performance
+    \item Hands-on exercises
+\end{itemize}
+\end{frame}
+
+
+%----------------------------------------------------------------------------------------
+% SECTION 1: Introduction
+%----------------------------------------------------------------------------------------
+
+\begin{frame}{What is TidalCycles?}
+\begin{columns}
+\column{0.6\textwidth}
+\begin{itemize}
+    \item Live coding environment for creating algorithmic patterns
+    \item Especially powerful for rhythmic and pattern-based music
+    \item Created by Alex McLean as part of the Algorave movement
+    \item Open source, written in Haskell
+    \item Concise syntax for complex musical ideas
+\end{itemize}
+
+\column{0.4\textwidth}
+\begin{center}
+
+\end{center}
+\end{columns}
+\end{frame}
+
+\begin{frame}{The Conventional TidalCycles Approach}
+\begin{columns}
+\column{0.6\textwidth}
+Traditional setup:
+\begin{itemize}
+    \item TidalCycles as pattern generator
+    \item SuperCollider as the sound engine
+    \item SuperDirt as synthesizer/sampler
+    \item Self-contained ecosystem
+\end{itemize}
+
+\column{0.4\textwidth}
+\begin{center}
+% [Image placeholder: Standard TidalCycles architecture]
+\end{center}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Our Producer-Oriented Approach}
+\begin{columns}
+\column{0.6\textwidth}
+\begin{itemize}
+    \item Use TidalCycles as a flexible controller
+    \item Integrate with standard production workflows
+    \item Control hardware synths via MIDI
+    \item Automate DAW parameters
+    \item Trigger external instruments (909, 303, Hydrasynth)
+    \item Focus on pattern generation, not sound synthesis
+\end{itemize}
+
+\column{0.4\textwidth}
+
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Pattern Basics}
+A simple patter to play MIDI notes
+\begin{lstlisting}[style=tidal]
+-- Simple pattern: Play C4, E4, G4, C5 in sequence
+
+d1 $ note "c4 e4 g4 c5" # s "midi"
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Tidal Timing: Cycles and Patterns}
+\begin{itemize}
+    \item Default: 1 cycle = 1 bar (adjustable with \texttt{setcps})
+    \item Tempo expressed in cycles per second
+    \item For 120 BPM: \texttt{setcps (120/60/4)} = 0.5 cycles per second
+\end{itemize}
+
+\begin{lstlisting}[style=tidal]
+-- Set tempo to 126 BPM
+setcps (126/60/4)
+
+-- Simple quarter note pattern
+d1 $ s "midi" # note "c4"
+
+-- Eighth notes
+d1 $ s "midi" # note "c4 e4"
+
+-- 16th notes (a 4-note pattern at twice the speed)
+d1 $ s "midi" # note "c4 e4 g4 c5*2"
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Pattern Syntax}
+\begin{itemize}
+    \item Simple sequences: \texttt{"a b c d"}
+    \item Grouping: \texttt{"[a b] c"}
+    \item Repetition: \texttt{"a*3 b"}
+    \item Alternation: \texttt{"<a b> c"}
+    \item Rest/silence: \texttt{"a ~ b c"}
+    \item Euclidean rhythms: \texttt{"c(3,8)"} (3 events spread over 8 steps)
+\end{itemize}
+
+\begin{lstlisting}[style=tidal]
+-- Different pattern examples
+d1 $ note "c4 [e4 g4] c5*2" # s "midi"
+d2 $ note "c4(3,8)" # s "midi"
+d3 $ note "<c4 e4> <g4 f4>" # s "midi"
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{Pattern Manipulation}
+Key functions for transforming patterns:
+\begin{columns}
+\column{0.5\textwidth}
+\begin{itemize}
+    \item \texttt{rev} - reverse
+    \item \texttt{slow} - stretch pattern
+    \item \texttt{fast} - compress pattern
+    \item \texttt{jux} - juxtapose transformations
+    \item \texttt{every} - apply function every n cycles
+\end{itemize}
+
+\column{0.5\textwidth}
+\begin{itemize}
+    \item \texttt{shuffle} - reorder elements
+    \item \texttt{palindrome} - forward then backward
+    \item \texttt{chop} - cut into smaller parts
+    \item \texttt{striate} - interleave segments
+    \item \texttt{swingBy} - add swing feel
+\end{itemize}
+\end{columns}
+
+\begin{lstlisting}[style=tidal]
+-- Add swing to a MIDI pattern
+d1 $ swingBy 0.08 8 $ note "c4 e4 g4 c5 e5 g5 e5 c5" # s "midi"
+\end{lstlisting}
+\end{frame}
+
+
+%----------------------------------------------------------------------------------------
+% SECTION 3: MIDI Integration
+%----------------------------------------------------------------------------------------
+
+\begin{frame}[fragile]{MIDI Integration with TidalCycles}
+\begin{itemize}
+    \item Connect to MIDI devices through SuperCollider
+    \item Send MIDI notes, CCs, and program changes
+    \item Each pattern can target different MIDI devices/channels
+    \item Synchronize with external equipment via MIDI clock
+\end{itemize}
+
+\begin{lstlisting}[style=tidal]
+-- SuperCollider MIDI setup example
+MIDIClient.init;
+~midiOut = MIDIOut.newByName("USB MIDI Interface", "Port 1");
+~dirt.soundLibrary.addMIDI(\midi, ~midiOut);
+
+-- In TidalCycles, use device "midi"
+d1 $ note "c4 e4 g4 c5" # s "midi" 
+   # midichan 0
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Practical MIDI Setup}
+\begin{itemize}
+    \item Multiple MIDI destinations: 
+\end{itemize}
+
+\begin{lstlisting}[style=tidal]
+-- SuperCollider setup with multiple destinations
+~midiOut1 = MIDIOut.newByName("TR-909", "MIDI IN");
+~midiOut2 = MIDIOut.newByName("TB-303", "MIDI IN");
+~midiOut3 = MIDIOut.newByName("Hydrasynth", "MIDI IN");
+
+-- Add these devices to SuperDirt with custom names
+~dirt.soundLibrary.addMIDI(\drums, ~midiOut1);
+~dirt.soundLibrary.addMIDI(\bass, ~midiOut2);
+~dirt.soundLibrary.addMIDI(\lead, ~midiOut3);
+
+-- In TidalCycles, use specific devices
+d1 $ note "36 ~ 38 ~" # s "drums"  -- kick/snare on 909
+d2 $ note "c2 [c2 eb2] f2 g2" # s "bass"  -- bassline on 303
+d3 $ note "c4 e4 g4 c5" # s "lead"  -- melody on Hydra
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Control Changes and Automation}
+\begin{itemize}
+    \item Send CC messages to control parameters
+    \item Create evolving parameter patterns
+    \item Control filter cutoff, resonance, envelopes, etc.
+\end{itemize}
+
+\begin{lstlisting}[style=tidal]
+-- Control cutoff (CC 74) on a 303
+d2 $ note "c2 [c2 eb2] f2 g2" # s "bass"
+   # ccn 74 # ccv (range 30 100 $ slow 8 $ sine)
+
+-- Multiple CC values simultaneously
+d3 $ note "c4 e4 g4 c5" # s "lead"
+   # stack [
+     ccn 74 # ccv (range 30 100 $ slow 8 $ sine),
+     ccn 71 # ccv (range 10 90 $ slow 7 $ saw)
+   ]
+\end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[fragile]{DAW Integration via IAC Bus}
+\begin{itemize}
+    \item Use IAC (Inter-Application Communication) Driver buses
+    \item Route MIDI from TidalCycles to DAW channels
+    \item Trigger instruments or control parameters in Ableton, Logic, etc.
+\end{itemize}
+
+\begin{lstlisting}[style=tidal]
+-- In SuperCollider
+~midiDAW = MIDIOut.newByName("IAC Driver", "Bus 1");
+~dirt.soundLibrary.addMIDI(\daw, ~midiDAW);
+
+-- In TidalCycles - control Ableton tracks
+d1 $ note "c4 e4 g4 c5" # s "daw" # midichan 0  -- Track 1
+d2 $ note "36 ~ 38 ~" # s "daw" # midichan 1    -- Track 2
+d3 $ ccn 74 # ccv (range 0 127 $ slow 4 $ sine) 
+   # s "daw" # midichan 2                       -- Automate Track 3
+\end{lstlisting}
+\end{frame}
+
+
+%----------------------------------------------------------------------------------------
+% SECTION 4: Advanced Pattern Techniques
+%----------------------------------------------------------------------------------------
+
+\begin{frame}[fragile]{Working with Scales and Chords}
+\begin{itemize}
+    \item Use musical scales rather than raw MIDI notes
+    \item Build chord progressions with scale degrees
+    \item Transpose patterns while staying in key
+\end{itemize}
+
+\begin{lstlisting}[style=tidal]
+-- Using the scale function for melodies
+d1 $ n (scale "minor" "0 2 4 7") # s "lead" |+ n "c"
+
+-- Creating a chord pattern in F minor
+d2 $ n (scale "minor" "[0,2,4]") # s "lead" |+ n "f"
+
+-- Add transposition within the scale
+d3 $ n (scale "minor" "[0,2,4]") |+ "-4" # s "lead" |+ n "f"
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Complex Chord Example from Desert Minimal}
+Breaking down a complex chord pattern:
+
+\begin{lstlisting}[style=tidal]
+-- Final complex chord pattern
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" 
+  |+ "-4" 
+  |+ "0")) 
+  # s "seven" 
+  |+ n ("0" |* 12) 
+  |+ n "f" 
+\end{lstlisting}
+
+Components:
+\begin{itemize}
+    \item \texttt{scale "minor"} - Use minor scale
+    \item \texttt{[0,2,4, -14, -4 \_]} - Chord structure with extensions
+    \item \texttt{|+ "-4"} - Transposition down 4 scale degrees
+    \item \texttt{|+ "0"} - Secondary transposition layer (can be changed)
+    \item \texttt{|+ n ("0" |* 12)} - Octave setting
+    \item \texttt{|+ n "f"} - Key of F
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Advanced Pattern Structures}
+\begin{itemize}
+    \item Combining pattern operators
+    \item Creating evolving patterns with slow transformations
+    \item Using randomization and chaos functions
+\end{itemize}
+
+\begin{lstlisting}[style=tidal]
+-- Complex pattern with multiple transformations
+d1 $ every 4 (fast 2) $ every 3 (rev) 
+   $ note (scale "minor" $ "0 [2 4] 7 <3 5>") 
+   # s "lead" |+ n "f"
+
+-- Pattern with evolving parameters
+d2 $ note "c2 [~ c2] <eb2 f2> g2" # s "bass"
+   # cutoff (range 300 2000 $ slow 8 $ sine)
+   # resonance (range 0.1 0.8 $ slow 7 $ tri)
+   # sustain (range 0.1 0.4 $ rand)
+\end{lstlisting}
+\end{frame}
+
+
+%----------------------------------------------------------------------------------------
+% SECTION 5: Case Study - Desert Minimal
+%----------------------------------------------------------------------------------------
+
+\begin{frame}{Case Study: Desert Minimal / Time Lapse}
+\begin{itemize}
+    \item Track: Time Lapse by Lenny Foret
+    \item From the physical tape release
+    \item Created with TidalCycles controlling external gear
+    \item Source: \url{https://mmxximnml.bandcamp.com/track/lenny-foret-time-lapse}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Track Structure Breakdown}
+\begin{enumerate}
+    \item Intro: Atmospheric risers
+    \item Section 1: Chord progression with complex harmony
+    \item Section 2: Basic beat with foundational rhythm
+    \item Section 3: Added textural elements
+    \item Section 4-18: Various pattern and effect variations
+    \item Final section: Sample slicing techniques
+\end{enumerate}
+
+We'll examine how different elements are controlled via MIDI and automation.
+\end{frame}
+
+\begin{frame}[fragile]{Chord Progression Analysis}
+From the desert-minimal.tidal file:
+
+\begin{lstlisting}[style=tidal]
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ ]" 
+  |+ "-4" 
+  |+ "0")) 
+  # s "seven" 
+  |+ n ("0" |* 12) 
+  |+ n "f" 
+\end{lstlisting}
+
+\begin{itemize}
+    \item Uses a complex chord structure in F minor
+    \item Includes extensions for rich harmony
+    \item Channel "seven" represents an external synth instrument
+    \item Forms the harmonic foundation of the track
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Rhythm Section Analysis}
+From the desert-minimal.tidal file:
+
+\begin{lstlisting}[style=tidal]
+d2 $ n ("{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15}%8" 	
+  |+ ("<0>" |* "16")
+  |+ "-24")
+  # s "drums" 
+ 
+d3 $ n ("{2 ~ }%8" 	
+  |+ ("<0>" |* "16")
+  |+ "-24")
+  # s "three" 
+\end{lstlisting}
+
+\begin{itemize}
+    \item \texttt{drums} channel controls drum machine via MIDI
+    \item Pattern uses 16 steps at 8 steps per cycle
+    \item Transposition \texttt{|+ "-24"} for proper drum mapping
+    \item Channel \texttt{three} adds sparse percussive elements
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Effect Processing Analysis}
+Control of external effects:
+
+\begin{lstlisting}[style=tidal]
+f3 $ segment 5 $ s "ch3"  
+    # stack [lowcut 0,
+          highcut 127,
+          senda 10,
+          sendb "<0 10 0 20 0 30>"]
+\end{lstlisting}
+
+\begin{itemize}
+    \item \texttt{f3} controls effect parameters via MIDI CCs
+    \item \texttt{segment 5} divides cycle into 5 equal parts
+    \item \texttt{stack} applies multiple parameters simultaneously
+    \item \texttt{senda}/\texttt{sendb} control external effect sends (reverb/delay)
+    \item Pattern \texttt{"<0 10 0 20 0 30>"} creates rhythmic modulation
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Adding Variation and Movement}
+Evolution techniques:
+
+\begin{lstlisting}[style=tidal]
+-- Add alternating values to the chord pattern
+d7 $ n (scale "minor" ( "[0,2,4, -14, -4 _ , ~ <6 2 >]" 
+  |+ "-4" 
+  |+ "<0>"))
+  # s "seven" 
+  |+ n ("0" |* 12) 
+  |+ n "f" 
+
+-- Add swing to drum patterns
+d2 $ swingBy 0.08 8 $ n ("{ ~ 0 1 2 }%16" 	
+  |+ ("<0 1>" |* "16")
+  |+ "-24")
+  # s "drums" 
+\end{lstlisting}
+
+\begin{itemize}
+    \item \texttt{<6 2>} alternates values on successive cycles
+    \item \texttt{swingBy 0.08 8} adds human-like timing variation
+    \item These techniques create organic movement in machine patterns
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Layer Integration for Intensity}
+Creating builds and drops:
+
+\begin{lstlisting}[style=tidal]
+do
+ f4 $ segment 5 $ s "ch4"  
+     # stack [lowcut 0,
+           highcut 100,
+           senda 100,
+           sendb 80]
+ d2 $ n ("{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15}%8" 
+  |+ ("<0>" |* "16")
+  |+ "-24")
+  # s "drums" 
+ d7 $ n (scale "minPent" ( "[0, <5 -2>, <8 2 1 0>, <-8 -6 -4>]" 
+  |+ "-4" 
+  |+ "0"))
+  # s "seven" 
+  |+ n ("0" |* 12) 
+  |+ n "f" 
+\end{lstlisting}
+
+\begin{itemize}
+    \item \texttt{do} block combines multiple changes simultaneously
+    \item Increases intensity through coordinated parameter changes
+    \item Builds tension through multiple evolving elements
+\end{itemize}
+\end{frame}
+
+
+%----------------------------------------------------------------------------------------
+% SECTION 6: Practical Implementation
+%----------------------------------------------------------------------------------------
+
+\begin{frame}{Hardware Setup for TidalCycles Production}
+Recommended hardware configuration:
+\begin{itemize}
+    \item Computer running TidalCycles
+    \item MIDI interface with multiple outputs
+    \item Hardware synthesizers (analog/digital)
+    \item Drum machines
+    \item Effects processors
+    \item Mixing console or audio interface
+    \item Optional: DAW for recording and additional processing
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Syncing with DAW and Hardware}
+Options for synchronization:
+\begin{itemize}
+    \item MIDI clock from TidalCycles to devices
+    \item MIDI clock from DAW to TidalCycles
+    \item Ableton Link integration:
+\end{itemize}
+\begin{lstlisting}[style=tidal]
+-- In SuperCollider setup file
+-- Create Link connection with 2 beats per cycle
+~link = LinkClock(2).latency_(s.latency);
+    
+-- Register the clock with SuperDirt
+~link.tempo_(120/60/2); // Set tempo (120 BPM)
+~dirt.serverControls = ~dirt.serverControls.addFirst(~link);
+\end{lstlisting}
+TidalCycles can adapt to different sync scenarios depending on your workflow.
+\end{frame}
+
+\begin{frame}[fragile]{Recording and Performance Setup}
+Best practices:
+\begin{itemize}
+    \item Set up automation recording in your DAW
+    \item Create templates for different hardware configurations
+    \item Organize MIDI channels consistently
+    \item Consider partial recording: MIDI patterns in DAW, but keep live control
+    \item For performance: create modular patterns that can be mixed/matched
+    \item Develop transitions between sections
+\end{itemize}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+% SECTION 7: Hands-on Exercises
+%----------------------------------------------------------------------------------------
+
+\begin{frame}[fragile]{Exercise 1: Building a Basic Pattern}
+Create a simple pattern that controls an external synth:
+
+\begin{lstlisting}[style=tidal]
+-- Set the tempo
+setcps (120/60/4)
+
+-- Create a basic pattern
+d1 $ note "c3 [~ c3] e3 g3" # s "bass"
+
+-- Add some pattern variation
+d1 $ every 4 (rev) $ note "c3 [~ c3] e3 g3" # s "bass"
+
+-- Add parameter modulation
+d1 $ every 4 (rev) $ note "c3 [~ c3] e3 g3" # s "bass"
+   # ccn 74 # ccv (range 30 100 $ slow 4 $ sine)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Exercise 2: Creating a Drum Pattern}
+Create drum patterns for an external drum machine:
+
+\begin{lstlisting}[style=tidal]
+-- Basic kick and snare pattern
+d2 $ n "36 ~ 38 ~" # s "drums"
+
+-- Add hi-hats
+d3 $ n "~ 42 ~ 42" # s "drums"
+
+-- Add a bit of swing
+d2 $ swingBy 0.06 8 $ n "36 ~ 38 ~" # s "drums"
+d3 $ swingBy 0.06 8 $ n "~ 42 ~ 42" # s "drums"
+
+-- Create fill variations
+d2 $ every 4 (fast 2) $ swingBy 0.06 8 $ n "36 ~ 38 ~" # s "drums"
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Exercise 3: Chord Progressions}
+Build a chord progression using scale degrees:
+
+\begin{lstlisting}[style=tidal]
+-- Basic triad in C minor
+d4 $ n (scale "minor" "[0,2,4]") # s "pad" |+ n "c"
+
+-- Create a progression
+d4 $ n (scale "minor" "<[0,2,4] [3,5,7] [-2,0,2] [1,3,5]>") 
+   # s "pad" |+ n "c"
+
+-- Add a parameter sweep
+d4 $ n (scale "minor" "<[0,2,4] [3,5,7] [-2,0,2] [1,3,5]>") 
+   # s "pad" |+ n "c"
+   # ccn 74 # ccv (range 20 110 $ slow 16 $ sine)
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Exercise 4: Putting It All Together}
+Combine elements into a coordinated pattern:
+
+\begin{lstlisting}[style=tidal]
+-- Use a "do" block to start multiple patterns
+do
+  -- Reset everything
+  hush
+  -- Set tempo
+  setcps (120/60/4)
+  -- Bass pattern
+  d1 $ note "c3 [~ c3] e3 g3" # s "bass"
+     # ccn 74 # ccv (range 30 100 $ slow 4 $ sine)
+  -- Drum pattern
+  d2 $ swingBy 0.06 8 $ n "36 ~ 38 ~" # s "drums"
+  d3 $ swingBy 0.06 8 $ n "~ 42 ~ 42" # s "drums"
+  -- Chord pattern
+  d4 $ n (scale "minor" "<[0,2,4] [3,5,7] [-2,0,2] [1,3,5]>") 
+     # s "pad" |+ n "c"
+\end{lstlisting}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+% SECTION 8: Conclusion and Resources
+%----------------------------------------------------------------------------------------
+
+\begin{frame}{Conclusion}
+\begin{itemize}
+    \item TidalCycles provides powerful pattern control for producers
+    \item Integration with external gear preserves your sound while adding algorithmic complexity
+    \item Benefits of this approach:
+    \begin{itemize}
+        \item Keep your familiar sounds and gear
+        \item Add algorithmic complexity to traditional setups
+        \item Combine programming precision with hardware character
+        \item Create patterns beyond traditional sequencing
+    \end{itemize}
+    \item Start small: add TidalCycles to one aspect of your production
+    \item Build up complexity as you become comfortable
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Resources}
+\begin{itemize}
+    \item Official TidalCycles documentation: \url{https://tidalcycles.org/docs/}
+    \item Tidal Club community: \url{https://club.tidalcycles.org/}
+    \item MIDI-specific tutorials: \url{https://tidalcycles.org/docs/pattern-language/midi/}
+    \item Algorave community: \url{https://algorave.com/}
+    \item Books:
+    \begin{itemize}
+        \item "Algorithmic Composition: A Guide to Composing Music with Nyquist" - Heintz
+        \item "The SuperCollider Book" - Wilson, Cottle, Collins
+    \end{itemize}
+    \item YouTube channels with TidalCycles tutorials
+    \item GitHub repositories with example patterns
+\end{itemize}
+\end{frame}
+
+\end{document}
