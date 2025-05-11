@@ -11,6 +11,12 @@
 
 -- Basic pattern - single sounds
 -- Evaluate each line using Shift+Enter
+
+d1 $ n (scale "minor " ( "{0 ___ 4 1 -1, 0'min}%4" |+ "0" |+ "-1")) 
+  # s "three" |+ n ("0" |* 12) |+ n "0" # midichan "10" 
+
+hush
+
 d1 $ sound "bd"         -- basic kick drum
 d2 $ sound "hh"         -- hi-hat
 d3 $ sound "arpy"       -- arpeggio sound

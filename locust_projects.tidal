@@ -2,86 +2,173 @@
 -- short hand for bpm of 125 when playing quarter notes
 setcps(125/60/4)
 
-d1 $ n (scale "minor" ( "{0 <~2 4> <~ [2 ]>~}%16" ))
+hush
+
+
+d2 
+  $ degradeBy "<0 0.1 0.2 0.3 0.4 0.8 0.1 >" $ n (scale "minor" "{0 <4 5> 1 <2 -1> 3 }%[16]")
+  # s "three" # midichan "10"  
+    # legato "{5 10 2 4}%16"  -- piano
+
+do
+ d3 $ slicedSamplePlayer 16 3 "six" 0
+
+d3 $ slicedSamplePlayer 16 2 "six" 0
+
+d4 $ whenmod 8 6 (const $ slicedSamplePlayer 32 2 "six" 0) $ slicedSamplePlayer 16 1 "six" 1
+
+
+d12 
+  $ degradeBy "0.5" $ n (scale "minPent" "0 1 2  0 4 4 1 1 0 4 1 2 3 4 5  0 0 2 1 1 1 1 1 1 1 1 1 1 1 1 1 ")
+  # s "three" # midichan "10"  
+    # legato "{5 10 2 4}%16"  -- piano
+
+d12 
+  $ degradeBy "0.8" $ rev $ n (scale "minor" "0 1 4 5 6 7 8 9  " |+ "<0 4 1 2 8 12 15 2  >")
+  # s "three" # midichan "10"  
+  |+ n "-24"
+    # legato "{5 10 2 4}%16"  -- piano
+
+do
+ d5 $ slicedSamplePlayer 16 4 "six" 2
+
+do
+ hush
+ d6 $ slicedSamplePlayer 8 8 "six" 4
+
+d5 $ silence
+
+do
+ hush
+ unsoloAll 
+ d12 $ n (scale "minor" ( "{0 <~2 4> <~ [2 ]>~}%16" ))
    # s "three"  |- n 12 |+ n "f"
    # midichan 0
-   # legato "{0.5 0.1 0.5 0.1 0.5 0.1 0.5 0.1}"
-
-d1 silence
-
-hush
+   # legato "{0.5 0.1 0.5 0.1 0.5 0.1 0.5 0.1}" -- percusive
 
 d2 $ slicedSamplePlayer 16 1 "three" 1
 
+d2 $ silence
+ 
 d1 $ whenmod 32 28 (const $ s "") $ n "{1 ~~~}%16" # s "three" # midichan 2  -- kick
+
+do
+ hush
+ unsoloAll
+ d1 $ whenmod 32 28 (const $ s "") $ n "{1 ~~~}%16" # s "three" # midichan 2  -- kick
+ d12 
+  $ degradeBy "<0 0.1 0.2 0.3 0.4 0.8 0.1 >" $ n (scale "minor" "[{0 2 }%4'<sus4 maj7 min>, 0 2@3 ]")
+  # s "three" # midichan "10"  
+    # legato "{5 10 2 4}%16"  -- piano
 
 d4 $ n "0" # s "three" # midichan 3 -- effect
 
-d5 $ slicedSamplePlayer 8 2 "three" 4
+d4 $ silence
+ 
+d5 $ slicedSamplePlayer 8 2 "three" 4 -- bass
+
+do
+ d4 $ silence
+ d5 $ slicedSamplePlayer 8 2 "three" 4 -- bass
+ d2 $ slicedSamplePlayer 16 1 "three" 1
+
+d6 $ whenmod 16 8 (const $ s "" ) $ slicedSamplePlayer 8 2 "three" 5 -- cymbal
 
 d6 $ slicedSamplePlayer 8 2 "three" 5 -- cymbal
 
 d7 $ slicedSamplePlayer 8 2 "three" 6 -- percussion
 
-d6 silence
+do
+ solo 12
+ solo 6
 
-d5 silence
+hush
 
-d4 silence
+mute 1
 
-d4 $ slicedSamplePlayer 4 4 "three" 7 -- riff
+do
+ unsoloAll
+ d12 $ silence
+ d4 $ slicedSamplePlayer 4 4 "three" 7 -- riff
+ unmute 1
 
 d8 $ slicedSamplePlayer 4 4 "three" 9 |+ n "[0|4|8|16]"-- low riff
 
-d4 $ n "{0 1}%4" # s "three" # midichan 7
-   # legato "0.8"
+d4 $ n "{0 1 }%4" # s "three" # midichan 7
+   # legato "1.5"
 
-d4 silence
-
-d4 $ n "{0 1 <8> -1  }%4" # s "three" # midichan 7
-   # legato "0.8"
-
-d10 $ n  "{f}%2" # s "three" |+ n 0 # midichan 8 # legato "0.8"
+d4 $ n "{0 1 3 5  }%4" # s "three" # midichan 7
+   # legato "1.5"
 
 do
+ -- dramatic solo!
+ d4 $ n ("{0 1 3 5  }%4" |+ "<0 0 4 4 1 1  >") # s "three" # midichan 7
+   # legato "1.5"
+ solo 4
+
+do
+ solo 7
+ d7 $ slicedSamplePlayer 8 2 "three" 6 -- percussion
+
+-- drop?
+
+do
+ unsoloAll
+ d12 $ silence
+ d4 $ n "{0 1 <8> -1  }%4" # s "three" # midichan 7
+   # legato "0.8"
+
+d10 $ n  "{f }%2" # s "three" |+ n 0 # midichan 8 # legato "0.8"
+
+do
+ d4 $ silence
  d10 $ n (scale "minor" "{4 2 __ 1@0.5 2  2@1.5 _ }%8") # s "three" |+ n "f" |+ n "12" # midichan 8 # legato "0.8"
 
-
-d10 $ n (scale "minor" "{4 2 __ 1@0.5 2  2@1.5 _ }%8") # s "three" |+ n "f" |+ n "-12" # midichan 8 # legato "0.8"
+do
+ solo 2 >> solo 4  >> solo 10
+ d10 $ n (scale "minor" "{4 2 __ 1@0.5 2  2@1.5 _ }%8") # s "three" |+ n "f" |+ n "-12" # midichan 8 # legato "0.8"
 
 do
- d10 $ n (scale "minor" "{4 2 __ 1@0.5 2  2@1.5 _ }%8" |+ ("0 ")) # s "three" |+ n "f" |+ n "-12" # midichan 8 # legato "0.8"
+ unsoloAll
  d4 silence
+ d10 $ n (scale "minor" "{4 2 __ 1@0.5 2  2@1.5 _ }%8" |+ ("0 ")) # s "three" |+ n "f" |+ n "-12" # midichan 8 # legato "0.8"
 
 d10 silence
 
 do
  d10 $ n (scale "minor" "{4 2 __ 1@0.5 2  2@1.5 _ }%8") # s "three" |+ n "f" |+ n "12" # midichan 8 # legato "0.8"
 
+d10 $ n (scale "minPent" "{4 2 __ 1@0.5 2  2@1.5 _ }%[4]") # s "three" |+ n "f" |+ n "12" # midichan 8 # legato "0.8"
 
- d10 $ n (scale "minPent" "{4 2 __ 1@0.5 2  2@1.5 _ }%[4]") # s "three" |+ n "f" |+ n "12" # midichan 8 # legato "0.8"
-
-solo 4 >> solo 10
-
-solo 8
 
 unsoloAll
 
-hush
+do 
+ d10 $ n (scale "minor" "{4 2 __ 1@0.5 2  2@1.5 _ }%8") # s "three" |+ n "f" |+ n "-12" # midichan 8 # legato "0.8"
+ solo 2 >> solo 10  >> solo 8
 
+solo 6
 
-d8 $ n ("f")
-   # s "three"  |+ n 12
+do
+ unsoloAll
+ mute 8
+ mute 9
+ d8 $ n ("f")
+   # s "three"  |+ n "-24"
    # midichan 0
    # legato "{0.5 0.1 0.5 0.1 0.5 0.1 0.5 0.1}"
 
-d8 $ silence
+d12 $ n (scale "minor " ( "0" |+ "0" |+ "-1")) 
+  # s "three" |+ n ("0" |* 12) |+ n "f" # midichan "4" 
 
-d5 $ n (scale "ritusen" ( "{0~~~~~<~2 4> ~~<~ [2 ]>~}%2" 
+do
+ unsoloAll
+ d5 $ n (scale "ritusen" ( "{0~~~~~<~2 4> ~~<~ [2 ]>~}%2" 
    |+ "<0 1  3 1 2  0>" 
-   |+ "-8"))
-   # s "five" 
+   |+ "0"))
+   # s "three"  |+ n "f" |+ n "-12"
    # legato "5"
+   # midichan 10
 
 d4 $ n (scale "ritusen" ( "{0 ~ 2 9  -2 -1}%16" ))
    # s "three" 
@@ -92,4 +179,130 @@ d4 $ n (scale "ritusen" ( "{0 ~ 2 9  -2 -1}%[4|4 2 1|4 3]" ))
    # s "three" 
    # midichan 0
    # legato "{0.5 0.1 0.5 0.1 0.5 0.1 0.5 0.1}"
+
+d4 $ silence
+
+
+do
+ hush
+ d5 $ n (scale "ritusen" ( "{0~~~~~<~2 4> ~~<~ [2 ]>~}%2" 
+   |+ "<0 1  3 1 2  0>" 
+   |+ "0"))
+   # s "three"  |+ n "f" |+ n "-12"
+   # legato "5"
+   # midichan 11 -- bass
+
+d6 $ slicedSamplePlayer 8 8 "three" 12 -- hats
+
+d7 $ slicedSamplePlayer 16 1 "three" 14 -- gmin sine
+
+d8 $ slicedSamplePlayer 16 1 "three" 15
+
+unmuteAll
+
+unsoloAll
+
+d9 $ slicedSamplePlayer 16 1 "four" 0
+
+d10 $ whenmod 28 34 (const $ slicedSamplePlayer 8 4 "four" 2 ) $ slicedSamplePlayer 8 4 "four" 1
+
+d7 $ slicedSamplePlayer 8 4 "three" 14 -- gmin sine
+
+d6 $ silence
+
+d7 $ slicedSamplePlayer 4 4 "three" 14 -- gmin sine
+
+d7 $ silence
+
+d8 $ silence
+
+d9 $ slicedSamplePlayer 8 1 "four" 0
+
+d7 $ slicedSamplePlayer 4 4 "three" 14 -- gmin sine
+
+solo 9 >> solo 7 
+
+solo 4
+
+do
+ solo 8
+ d8 $ 
+   midinote ("{0 <~ <0 ~>> <~ <0 ~>>  ~ ~ }%16" |+ "36") # s "four"  # midichan "3"
+  
+ 
+
+do
+ d9 $ slicedSamplePlayer 8 1 "four" 0
+ d7 $ slicedSamplePlayer 4 4 "three" 14 -- gmin sine
+
+do
+ hush
+ unsoloAll
+ d8 $ whenmod 28 34  (const $ s "") $ 
+   midinote ("{0 <~ <0 ~>> <~ <0 ~>>  ~ ~ }%16" |+ "36") # s "four"  # midichan "3"
+ d9 $ slicedSamplePlayer 16 1 "three" 4
+ 
+d10 $ slicedSamplePlayer 16 1 "three" 1
+
+d11 $ slicedSamplePlayer 8 4 "four" 4
+
+d12 $ slicedSamplePlayer 8 4 "four" 5
+
+
+do
+ hush
+ d8 $ whenmod 28 34  (const $ s "") $ 
+   midinote ("{0 <~ <0 ~>> <~ <0 ~>>  ~ ~ }%16" |+ "36") # s "four"  # midichan "3"
+ d9 $ slicedSamplePlayer 16 1 "three" 4
+
+-- d3 $ slicedSamplePlayer 16 1 "three" 6
+
+d3 $ slicedSamplePlayer 8 2 "four" 6
+
+d4 $ slicedSamplePlayer 8 2 "four" 7
+
+once $ slicedSamplePlayer 8 1 "four" 8 |+ n 4
+
+d5 $ slicedSamplePlayer 4 8 "four" 8
+
+d5 $ slicedSamplePlayer 8 8 "four" 9
+
+d5 $ silence
+
+once $ slicedSamplePlayer 12 1 "four" 9 |+ n 12
+
+
+d5 $ slicedSamplePlayer 16 2 "four" 10
+
+d6 $ slicedSamplePlayer 4 1 "five" 0 --  Amin
+
+d6 $ slicedSamplePlayer 8 1 "five" 0  |+ n "4" --  Amin
+
+d6 $ slicedSamplePlayer 8 1 "five" 0  |+ n "8" --  Amin
+
+d6 $ striate 2 $ slicedSamplePlayer 16 2 "five" 0  |+ n "12" --  Amin
+
+d6 $ 
+  repeatCycles 2 $ 
+ degradeBy "0.9 " $ slicedSamplePlayer 32 1 "five" 0  |+ n "8" --  Amin
+
+d7 $ slicedSamplePlayer 8 2 "five" 1
+
+d7 $ slicedSamplePlayer 8 2 "five" 2
+
+d8 $ slicedSamplePlayer 8 4 "five" 3
+
+d6 $ slicedSamplePlayer 4 8 "five" 0 --  Amin
+
+hush
+
+solo 6 >> solo 5 >> solo 4
+
+do
+ unsoloAll
+ d6 $ slicedSamplePlayer 4 1 "five" 0 --  Amin
+
+do
+ hush
+ d6 $ slicedSamplePlayer 4 8 "five" 0 --  Amin
 
